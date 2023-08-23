@@ -38,6 +38,9 @@ const operate = function (a, op, b) {
     case "^":
       return calculator.power(a, b);
       break;
+    case "%":
+      return calculator.modulo(a);
+      break;
   }
 };
 
@@ -63,7 +66,7 @@ for (number of numbers) {
 for (operator of operators) {
   operator.addEventListener("click", operatorClickHandler);
 }
-percent.addEventListener("click", percentHandler);
+// percent.addEventListener("click", percentHandler);
 equal.addEventListener("click", equalHandler);
 delAll.addEventListener("click", reset);
 del.addEventListener("click", removeLast);
@@ -80,7 +83,7 @@ function num1ClickHandler(e) {
   answer.textContent = newVar + e.target.textContent;
   newVar = answer.textContent;
   num1 = answer.textContent;
-  console.log(`num1 is ${num1}`);
+  console.log(num1);
 }
 function operatorClickHandler(e) {
   opClicked = true;
@@ -88,37 +91,53 @@ function operatorClickHandler(e) {
   op = e.target.textContent;
   arr.push(op);
   newVar = "";
+  if (op == "%") {
+    percentHandler();
+  }
   if (!(num2 == undefined)) {
-    if(!ans){
-    question.textContent =
-      operate(num1, arr[arr.length - 2], num2) + e.target.textContent;
-    num1 = operate(num1, arr[arr.length - 2], num2);
-    }
-    else{
-        question.textContent = answer.textContent + e.target.textContent;
+    if (!ans) {
+      if (op == "%") {
+        percentHandler();
+      }
+      question.textContent =
+        operate(num1, arr[arr.length - 2], num2) + e.target.textContent;
+      num1 = operate(num1, arr[arr.length - 2], num2);
+      answer.textContent = parseInt(question.textContent);
+    } else {
+      if (op == "%") {
+        percentHandler();
+      }
+      question.textContent = answer.textContent + e.target.textContent;
+      answer.textContent = parseInt(question.textContent);
     }
   }
 }
 
 function num2ClickHandler(e) {
+  ans = false;
   answer.textContent = newVar + e.target.textContent;
   newVar = answer.textContent;
   num2 = answer.textContent;
-  console.log(` num 2 is ${num2}`);
 }
 function percentHandler() {
-  question.textContent = answer.textContent + "%";
-  answer.textContent = calculator.modulo(answer.textContent);
+  answer.textContent = Number(operate(num1, op).toString().slice(0, 10));
+  num1 = answer.textContent;
 }
+
 function equalHandler() {
-    ans = true;
+  ans = true;
+  if (op == "%") {
+    question.textContent = `${num1 * 100} ${op}`;
+  }
   if (num1 == undefined && num2 == undefined) {
     answer.textContent = 0;
   } else if (num2 == undefined) {
-    answer.textContent = num1;
+    answer.textContent = answer.textContent;
   } else {
     question.textContent = `${num1} ${op} ${num2} =`;
-    answer.textContent = operate(num1, op, num2);
+    answer.textContent = Number(
+      operate(num1, op, num2).toString().slice(0, 10)
+    );
     num1 = answer.textContent;
     newVar = "";
   }
@@ -127,6 +146,8 @@ function reset() {
   answer.textContent = "";
   question.textContent = "";
   opClicked = false;
+  num1 = undefined;
+  num2 = undefined;
   newVar = "";
   ans = false;
 }
@@ -136,9 +157,12 @@ function removeLast() {
     numAsString = num1.toString().slice(0, -1);
     num1 = Number(numAsString);
     answer.textContent = num1;
+    newVar = num1;
+    console.log(num1);
   } else {
     numAsString = num2.toString().slice(0, -1);
     num2 = Number(numAsString);
     answer.textContent = num2;
+    newVar = num2;
   }
 }
